@@ -1,11 +1,18 @@
 package com.example.htmlgameshow.view
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -24,6 +31,10 @@ import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.example.htmlgameshow.R
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -39,7 +50,7 @@ fun ListDetailPane() {
                 value = scaffoldNavigator.scaffoldValue,
                 listPane = {
                     AnimatedPane(modifier = Modifier.padding(it)) {
-                        ListingGames(scaffoldNavigator)
+                        ListingGamesByGrid(scaffoldNavigator)
                     }
                 },
                 detailPane = {
@@ -58,7 +69,8 @@ fun ListDetailPane() {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
 private fun TopBarGames(scaffoldNavigator: ThreePaneScaffoldNavigator<String>) {
     CenterAlignedTopAppBar(
-        title = { Text("Games") },
+        title = { Text("\nGames", maxLines = 2) },
+        modifier = Modifier.height(100.dp),
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary
@@ -86,6 +98,52 @@ private fun TopBarGames(scaffoldNavigator: ThreePaneScaffoldNavigator<String>) {
         },
     )
 }
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+private fun ListingGamesByGrid(
+    scaffoldNavigator: ThreePaneScaffoldNavigator<String>,
+    modifier: Modifier = Modifier
+) {
+    val listState = rememberLazyGridState()
+    val targets = listOf("newwordle", "sudokudetective", "equationexplorer", "cipherchronicles", "numerictowers")
+    val displayImages = mapOf(
+        "wordtetris" to R.drawable.wordtetris,
+        "lettersname" to R.drawable.lettersnake,
+        "newwordle" to R.drawable.wordtetris,
+        "sudokudetective" to R.drawable.lettersnake,
+        "numerictowers" to R.drawable.numerictower
+    )
+    LazyVerticalGrid(columns = GridCells.Adaptive(180.dp), state = listState) {
+        items(targets.size * 5) {
+            val target = targets.get(it % 5)
+            val imageId = displayImages.getOrDefault(target, R.drawable.default_thumbnail)
+            ListingGameByGridItem(target, scaffoldNavigator, thumbnailImage = imageId)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Composable
+private fun ListingGameByGridItem(
+    target: String,
+    scaffoldNavigator: ThreePaneScaffoldNavigator<String>,
+    thumbnailImage: Int = R.drawable.default_thumbnail
+) {
+    Card(
+        modifier = Modifier
+            .padding(20.dp)
+            .size(width = 180.dp, height = 200.dp),
+        onClick = { scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail, target) }
+    ) {
+        Image(
+            painter = painterResource(thumbnailImage),
+            contentDescription = target,
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
