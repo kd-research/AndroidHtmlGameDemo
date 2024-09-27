@@ -17,16 +17,13 @@ fun ListingGamesByGrid(
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyGridState()
-    val targets = listOf("newwordle", "sudokudetective", "equationexplorer", "cipherchronicles", "numerictowers")
+    val targets = listOf("numerictowers", "retrowordtetris", "wordsnake", "mathdash", "wordcollapse")
     val displayImages = mapOf(
-        "wordtetris" to R.drawable.wordtetris,
-        "lettersnake" to R.drawable.lettersnake,
+        "wordsnake" to R.drawable.lettersnake,
         "numerictowers" to R.drawable.numerictower,
-        "mathdash" to R.drawable.mathdash
-    ) + mapOf(
-        "sudokudetective" to R.drawable.lettersnake,
-        "newwordle" to R.drawable.wordtetris,
-        "equationexplorer" to R.drawable.mathdash
+        "mathdash" to R.drawable.mathdash,
+        "retrowordtetris" to R.drawable.wordtetris,
+        "wordcollapse" to R.drawable.wordcollapse
     )
     LazyVerticalGrid(modifier = modifier, columns = GridCells.Adaptive(180.dp), state = listState) {
         items(targets.size) {

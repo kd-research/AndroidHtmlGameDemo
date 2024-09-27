@@ -157,19 +157,19 @@ private fun ListingGames(
 ) {
     LazyColumn {
         item {
-            ListGameItem("New Wordle", "newwordle", scaffoldNavigator)
-            HorizontalDivider()
+            ListGameItem("Numeric Towers", "numerictowers", scaffoldNavigator)
         }
         item {
-            ListGameItem("Sudoku Detective", "sudokudetective", scaffoldNavigator)
-            HorizontalDivider()
+            ListGameItem("Retro Word Tetris", "retrowordtetris", scaffoldNavigator)
         }
         item {
-            ListGameItem("Equation Explorer", "equationexplorer", scaffoldNavigator)
-            HorizontalDivider()
+            ListGameItem("Letter Snake", "wordsnake", scaffoldNavigator)
         }
         item {
-            ListGameItem("Cipher Chronicles", "cipherchronicles", scaffoldNavigator)
+            ListGameItem("Math Dash", "mathdash", scaffoldNavigator)
+        }
+        item {
+            ListGameItem("Word Collapse", "wordcollapse", scaffoldNavigator)
         }
     }
 }
