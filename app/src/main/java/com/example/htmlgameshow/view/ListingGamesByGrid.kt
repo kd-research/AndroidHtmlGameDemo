@@ -17,7 +17,7 @@ fun ListingGamesByGrid(
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyGridState()
-    val targets = listOf("newwordle", "sudokudetective", "equationexplorer", "cipherchronicles", "numerictowers")
+    val targets = listOf("newwordle", "sudokudetective", "equationexplorer", "cipherchronicles", "numerictowers", "lettersnake", "wordtetris", "wordwheels", "lexiconlegends")
     val displayImages = mapOf(
         "wordtetris" to R.drawable.wordtetris,
         "lettersnake" to R.drawable.lettersnake,
