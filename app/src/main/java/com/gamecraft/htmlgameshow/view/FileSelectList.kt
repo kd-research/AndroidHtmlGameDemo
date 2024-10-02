@@ -1,4 +1,4 @@
-package com.example.htmlgameshow.view
+package com.gamecraft.htmlgameshow.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

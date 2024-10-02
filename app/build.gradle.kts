@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.htmlgameshow"
+    namespace = "com.gamecraft.htmlgameshow"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.htmlgameshow"
+        applicationId = "com.gamecraft.htmlgameshow"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.adaptive.layout.android)
+    implementation(libs.androidx.room.common)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,4 +1,4 @@
-package com.example.htmlgameshow
+package com.gamecraft.htmlgameshow
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
@@ -8,7 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.htmlgameshow.view.ListDetailPane
+import com.gamecraft.htmlgameshow.view.ListDetailPane
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("SourceLockedOrientationActivity")

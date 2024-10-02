@@ -1,4 +1,4 @@
-package com.example.htmlgameshow
+package com.gamecraft.htmlgameshow
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

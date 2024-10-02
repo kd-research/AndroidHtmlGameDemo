@@ -1,4 +1,4 @@
-package com.example.htmlgameshow
+package com.gamecraft.htmlgameshow
 
 import org.junit.Test
 

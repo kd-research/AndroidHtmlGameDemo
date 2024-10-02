@@ -1,4 +1,4 @@
-package com.example.htmlgameshow.view
+package com.gamecraft.htmlgameshow.view
 
 import android.annotation.SuppressLint
 import android.view.ViewGroup

@@ -1,4 +1,4 @@
-package com.example.htmlgameshow.ui.theme
+package com.gamecraft.htmlgameshow.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
