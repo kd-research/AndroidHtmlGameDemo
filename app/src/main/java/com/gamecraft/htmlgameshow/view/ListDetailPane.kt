@@ -39,7 +39,7 @@ fun ListDetailPane(viewModel: GameIndexViewModel = GameIndexViewModel()) {
                         contentScale = ContentScale.Crop
                     )
             ) {
-                ListingGamesByGrid(scaffoldNavigator, viewModel, modifier = Modifier.padding(top = 100.dp))
+                ListingGamesByGrid(scaffoldNavigator, viewModel, modifier = Modifier)
                 Box {
                     val context = LocalContext.current
                     IconButton(onClick = { viewModel.resetDb(context) }) {

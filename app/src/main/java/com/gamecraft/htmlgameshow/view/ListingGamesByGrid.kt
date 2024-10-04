@@ -1,5 +1,6 @@
 package com.gamecraft.htmlgameshow.view
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -22,7 +23,7 @@ fun ListingGamesByGrid(
 ) {
     val lazyGridState = rememberLazyGridState()
 
-    LazyVerticalGrid(modifier = modifier, columns = GridCells.Adaptive(180.dp), state = lazyGridState) {
+    LazyVerticalGrid(contentPadding = PaddingValues(vertical = 50.dp), modifier = modifier, columns = GridCells.Adaptive(180.dp), state = lazyGridState) {
         items(viewModel.games) { game ->
             ListingGameByGridItem(
                 game,

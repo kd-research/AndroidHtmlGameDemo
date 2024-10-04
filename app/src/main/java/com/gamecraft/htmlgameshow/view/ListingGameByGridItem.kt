@@ -41,7 +41,7 @@ fun ListingGameByGridItem(
         ),
         modifier = Modifier
             .padding(horizontal = 20.dp, vertical = 10.dp)
-            .size(width = 180.dp, height = 200.dp),
+            .size(width = 180.dp, height = 195.dp),
         onClick = onItemClick
     ) {
         Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
@@ -59,7 +59,7 @@ fun ListingGameByGridItem(
         Box(modifier = Modifier.padding(horizontal = 10.dp)) {
             Text("${target.name}\nHigh Score: ${target.highestScore}", fontFamily = FontFamily.SansSerif, fontSize = 10.sp, fontWeight = FontWeight.Bold)
             IconButton(
-                modifier = Modifier.absoluteOffset(x = 110.dp, y = -10.dp),
+                modifier = Modifier.absoluteOffset(x = 110.dp, y = -5.dp),
                 onClick = onFavouriteClick,
             ) {
                 if (target.favourite)
