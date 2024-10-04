@@ -36,6 +36,12 @@ class GameIndexViewModel : ViewModel() {
             GameDatabase.resetDb(context)
             fetchGames()
         }
+    }
 
+    fun resetHighScores() {
+        viewModelScope.launch {
+            GameDatabase.resetHighScores()
+            fetchGames()
+        }
     }
 }

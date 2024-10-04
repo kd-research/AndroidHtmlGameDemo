@@ -22,4 +22,7 @@ interface GameDao {
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(game: Game)
+
+    @Query("Update game Set highestScore = 0")
+    fun resetHighestScore()
 }

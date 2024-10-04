@@ -19,49 +19,49 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.gamecraft.htmlgameshow.data.Game
-import com.gamecraft.htmlgameshow.data.GameDatabase
 import com.gamecraft.htmlgameshow.jshelper.GameJsInterface
 import com.gamecraft.htmlgameshow.viewmodel.GameIndexViewModel
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun HtmlRender(game: Game, navigator: ThreePaneScaffoldNavigator<Game>, viewModel: GameIndexViewModel, modifier: Modifier = Modifier) {
+fun HtmlRender(
+    game: Game,
+    navigator: ThreePaneScaffoldNavigator<Game>,
+    viewModel: GameIndexViewModel,
+    modifier: Modifier = Modifier
+) {
     var webView by remember { mutableStateOf<WebView?>(null) }
 
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center
+        modifier = modifier, verticalArrangement = Arrangement.Center
     ) {
-        AndroidView(
-            factory = {
-                webView = WebView(it)
-                webView!!.apply {
-                    settings.javaScriptEnabled = true
-                    settings.allowFileAccess = true
-                    settings.useWideViewPort = true
+        AndroidView(factory = {
+            webView = WebView(it)
+            webView!!.apply {
+                settings.javaScriptEnabled = true
+                settings.allowFileAccess = true
+                settings.useWideViewPort = true
+                settings.domStorageEnabled = true
 
-                    val jsInterface = GameJsInterface(game, viewModel)
+                val jsInterface = GameJsInterface(game, viewModel)
 
-                    addJavascriptInterface(jsInterface, "Platform")
-                    //settings.loadWithOverviewMode = true
+                addJavascriptInterface(jsInterface, "Platform")
+                //settings.loadWithOverviewMode = true
 
-                    layoutParams = LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                    )
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+                )
 
-                    //webViewClient = WebViewClient()
-                    webChromeClient = WebChromeClient()
+                //webViewClient = WebViewClient()
+                webChromeClient = WebChromeClient()
 
-                    loadUrl("file:///android_asset/htmls/" + game.html)
-                }
+                loadUrl("file:///android_asset/htmls/" + game.html)
             }
-        )
+        })
     }
 
     Box {

@@ -6,7 +6,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Game::class], version = 7, exportSchema = false)
+@Database(entities = [Game::class], version = 1, exportSchema = false)
 abstract class GameDatabase : RoomDatabase() {
     abstract fun dao(): GameDao
 
@@ -52,6 +52,10 @@ abstract class GameDatabase : RoomDatabase() {
         fun resetDb(context: Context) {
             DATABASE!!.clearAllTables()
             importGames(context)
+        }
+
+        fun resetHighScores() {
+            db().resetHighestScore()
         }
     }
 }

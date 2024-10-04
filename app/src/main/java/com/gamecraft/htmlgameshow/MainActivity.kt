@@ -15,9 +15,10 @@ import com.gamecraft.htmlgameshow.view.ListDetailPane
 class MainActivity : ComponentActivity() {
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
+
         super.onCreate(savedInstanceState)
 
-        installSplashScreen()
         GameDatabase.initDb(this)
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT

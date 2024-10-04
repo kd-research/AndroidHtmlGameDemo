@@ -23,13 +23,21 @@ fun ListingGamesByGrid(
 ) {
     val lazyGridState = rememberLazyGridState()
 
-    LazyVerticalGrid(contentPadding = PaddingValues(vertical = 50.dp), modifier = modifier, columns = GridCells.Adaptive(180.dp), state = lazyGridState) {
+    LazyVerticalGrid(
+        contentPadding = PaddingValues(vertical = 60.dp),
+        modifier = modifier,
+        columns = GridCells.Adaptive(180.dp),
+        state = lazyGridState
+    ) {
         items(viewModel.games) { game ->
-            ListingGameByGridItem(
-                game,
-                onFavouriteClick = {viewModel.toggleFavourite(game)},
-                onItemClick = {scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail, game)}
-            )
+            ListingGameByGridItem(game,
+                onFavouriteClick = { viewModel.toggleFavourite(game) },
+                onItemClick = {
+                    scaffoldNavigator.navigateTo(
+                        ListDetailPaneScaffoldRole.Detail,
+                        game
+                    )
+                })
         }
     }
 }
