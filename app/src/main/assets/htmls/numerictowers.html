@@ -665,6 +665,7 @@
               } else {
                 // Invalid placement due to stacking mode
                 this.isGameOver = true;
+                Platform.setHighestScore(this.score);
                 this.ui.endGame();
               }
               return;

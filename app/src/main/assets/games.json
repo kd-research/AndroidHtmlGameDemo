@@ -1,0 +1,48 @@
+[
+  {
+    "id": 0,
+    "name": "Letter Loft",
+    "icon": "letterloft.jpg",
+    "html": "letterloft.html"
+  },
+  {
+    "id": 2,
+    "name": "Math Dash",
+    "icon": "mathdash.webp",
+    "html": "mathdash.html",
+    "highestScore": 0,
+    "favourite": 0
+  },
+  {
+    "id": 5,
+    "name": "Numeric Towers",
+    "icon": "numerictower.webp",
+    "html": "numerictowers.html",
+    "highestScore": 0,
+    "favourite": 0
+  },
+  {
+    "id": 3,
+    "name": "Word Tetris",
+    "icon": "wordtetris.webp",
+    "html": "retrowordtetris.html",
+    "highestScore": 0,
+    "favourite": 0
+  },
+  {
+    "id": 4,
+    "name": "Word Collapse",
+    "icon": "wordcollapse.jpg",
+    "html": "wordcollapse.html",
+    "highestScore": 0,
+    "favourite": 0
+  },
+  {
+    "id": 1,
+    "name": "Word Snake",
+    "icon": "lettersnake.webp",
+    "html": "wordsnake.html",
+    "highestScore": 0,
+    "favourite": 0
+  }
+]
