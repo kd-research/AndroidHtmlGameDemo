@@ -9,40 +9,36 @@
     "id": 2,
     "name": "Math Dash",
     "icon": "mathdash.webp",
-    "html": "mathdash.html",
-    "highestScore": 0,
-    "favourite": 0
+    "html": "mathdash.html"
   },
   {
-    "id": 5,
+    "id": 4,
     "name": "Numeric Towers",
     "icon": "numerictower.webp",
-    "html": "numerictowers.html",
-    "highestScore": 0,
-    "favourite": 0
+    "html": "numerictowers.html"
   },
   {
     "id": 3,
     "name": "Word Tetris",
     "icon": "wordtetris.webp",
-    "html": "retrowordtetris.html",
-    "highestScore": 0,
-    "favourite": 0
-  },
-  {
-    "id": 4,
-    "name": "Word Collapse",
-    "icon": "wordcollapse.jpg",
-    "html": "wordcollapse.html",
-    "highestScore": 0,
-    "favourite": 0
+    "html": "retrowordtetris.html"
   },
   {
     "id": 1,
     "name": "Word Snake",
     "icon": "lettersnake.webp",
-    "html": "wordsnake.html",
-    "highestScore": 0,
-    "favourite": 0
+    "html": "wordsnake.html"
+  },
+  {
+    "id": 5,
+    "name": "Snake Escape",
+    "icon": "snakeescape.webp",
+    "html": "classicsnake.html"
+  },
+  {
+    "id": 6,
+    "name": "Fit it Right",
+    "icon": "fititright.webp",
+    "html": "classictetris.html"
   }
 ]

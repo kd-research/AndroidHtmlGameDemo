@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+      name="viewport"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap"
+      rel="stylesheet"
+    />
+    <title>Tetris</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #1e1e1e 0%, #3c3c3c 100%);
+      }
+
+      .active {
+        display: block !important;
+      }
+
+      .screen {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Start Menu Screen Styles */
+      #start-menu-screen .container {
+        background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+        position: relative;
+        overflow: hidden;
+        border: 3px solid #fff;
+        border-radius: 12px;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        color: #fff;
+        font-family: "Orbitron", sans-serif;
+        text-align: center;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-sizing: border-box;
+      }
+
+      #start-menu-screen .container #game-title {
+        font-size: 48px;
+        color: #ffffff;
+        text-shadow: 2px 2px 4px #000000;
+        margin-bottom: 50px;
+      }
+
+      #start-menu-screen .container button {
+        background: linear-gradient(135deg, #283c86 0%, #45a247 100%);
+        border: 2px solid #fff;
+        border-radius: 8px;
+        color: #fff;
+        font-family: "Orbitron", sans-serif;
+        font-size: 18px;
+        text-transform: uppercase;
+        text-align: center;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        padding: 12px 30px;
+        margin: 20px auto 0;
+        display: inline-block;
+        width: 215.15px;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+
+      #start-menu-screen .container button:hover {
+        background: linear-gradient(135deg, #45a247 0%, #283c86 100%);
+        transform: scale(1.05);
+      }
+
+      #start-menu-screen .container button:active {
+        transform: scale(0.95);
+      }
+
+      /* Instructions Screen Styles */
+      #instructions-screen {
+        background: rgba(0, 0, 0, 0.7);
+      }
+
+      #instructions-screen .container {
+        background: rgba(0, 0, 0, 0.7);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        max-height: 80%;
+        overflow-y: auto;
+        background: #fff;
+        padding: 20px;
+        box-sizing: border-box;
+        border-radius: 10px;
+      }
+
+      #instructions-screen .container h2 {
+        text-align: center;
+      }
+
+      #instructions-screen .container p {
+        font-size: 18px;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      #instructions-screen .container ul {
+        font-size: 18px;
+        color: #333;
+        line-height: 1.6;
+        list-style-type: disc;
+        padding-left: 20px;
+      }
+
+      #instructions-screen .container button {
+        margin-top: 20px;
+        background: linear-gradient(135deg, #283c86 0%, #45a247 100%);
+        border: 2px solid #fff;
+        border-radius: 8px;
+        color: #fff;
+        font-family: "Orbitron", sans-serif;
+        font-size: 18px;
+        text-transform: uppercase;
+        text-align: center;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        padding: 12px 30px;
+        display: inline-block;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+
+      #instructions-screen .container button:hover {
+        background: linear-gradient(135deg, #45a247 0%, #283c86 100%);
+        transform: scale(1.05);
+      }
+
+      /* Game Screen Styles */
+      #game-container .container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        background: linear-gradient(135deg, #232526, #414345);
+      }
+
+      #game-container .game-area {
+        position: relative;
+        width: 300px;
+        height: 600px;
+        background: rgba(17, 17, 17, 0.9);
+        border: 2px solid #fff;
+        border-radius: 10px;
+        display: grid;
+        grid-template-rows: repeat(20, 1fr);
+        grid-template-columns: repeat(10, 1fr);
+        overflow: hidden;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      }
+
+      #game-container .hud {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: #fff;
+        font-family: "Orbitron", sans-serif;
+        font-size: 18px;
+        text-align: right;
+      }
+
+      #game-container .hud div {
+        margin-bottom: 5px;
+      }
+
+      .cell {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        box-sizing: border-box;
+      }
+
+      .cell.filled {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.3),
+          inset 1px 1px 0px rgba(255, 255, 255, 0.3);
+      }
+
+      /* Tetromino Styles */
+      .cell.filled.yellow {
+        background: linear-gradient(135deg, #f6d365, #fda085);
+      }
+
+      .cell.filled.cyan {
+        background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      }
+
+      .cell.filled.blue {
+        background: linear-gradient(135deg, #74ebd5, #9face6);
+      }
+
+      .cell.filled.orange {
+        background: linear-gradient(135deg, #ff9a9e, #fecfef);
+      }
+
+      .cell.filled.green {
+        background: linear-gradient(135deg, #c1dfc4, #deecdd);
+      }
+
+      .cell.filled.red {
+        background: linear-gradient(135deg, #f05f57, #360940);
+      }
+
+      .cell.filled.purple {
+        background: linear-gradient(135deg, #c471f5, #fa71cd);
+      }
+
+      /* Next Tetromino Preview */
+      .next-tetrominoes {
+        position: absolute;
+        top: 200px;
+        right: 10px;
+        width: 100px;
+        color: #fff;
+        font-family: "Orbitron", sans-serif;
+      }
+
+      .next-tetrominoes h3 {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+
+      .next-tetrominoes .next {
+        width: 100%;
+        height: 100px;
+        background: rgba(34, 34, 34, 0.9);
+        margin-bottom: 10px;
+        display: grid;
+        grid-template-rows: repeat(4, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+        border: 1px solid #fff;
+        border-radius: 5px;
+      }
+
+      .next-tetrominoes .next div {
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        box-sizing: border-box;
+      }
+
+      /* Score Popup Styles */
+      .score-popup {
+        position: absolute;
+        color: #fff;
+        font-family: "Orbitron", sans-serif;
+        font-size: 24px;
+        text-align: center;
+        animation: popup 1s ease-out forwards;
+        pointer-events: none;
+      }
+
+      @keyframes popup {
+        0% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-50px);
+        }
+      }
+
+      /* Game Over Screen Styles */
+      #game-over-screen .container {
+        background: rgba(0, 0, 0, 0.8);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        max-height: 80%;
+        overflow-y: auto;
+        background: #fff;
+        padding: 20px;
+        box-sizing: border-box;
+        border-radius: 10px;
+        text-align: center;
+      }
+
+      #game-over-screen .container #game-over-message {
+        font-size: 36px;
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      #game-over-screen .container button {
+        background: linear-gradient(135deg, #283c86 0%, #45a247 100%);
+        border: 2px solid #fff;
+        border-radius: 8px;
+        color: #fff;
+        font-family: "Orbitron", sans-serif;
+        font-size: 18px;
+        text-transform: uppercase;
+        text-align: center;
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        padding: 12px 30px;
+        margin: 10px;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+
+      #game-over-screen .container button:hover {
+        background: linear-gradient(135deg, #45a247 0%, #283c86 100%);
+        transform: scale(1.05);
+      }
+
+      /* Responsive Styles */
+      @media only screen and (max-width: 600px) {
+        #game-title {
+          font-size: 36px;
+        }
+        button {
+          font-size: 16px;
+          padding: 10px 20px;
+        }
+        #game-container .hud {
+          font-size: 16px;
+        }
+        #game-container .game-area {
+          width: 200px;
+          height: 400px;
+        }
+        .next-tetrominoes {
+          width: 80px;
+          top: 150px;
+        }
+        .next-tetrominoes .next {
+          height: 80px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Start Menu Screen -->
+    <div class="active screen" id="start-menu-screen">
+      <div class="container">
+        <h1 id="game-title">Tetris</h1>
+        <button id="play-button">Play</button>
+        <button id="instructions-button">Instructions</button>
+      </div>
+    </div>
+    <!-- Instructions Screen -->
+    <div class="screen" id="instructions-screen">
+      <div class="container">
+        <h2>Instructions</h2>
+        <p>
+          Stack the falling tetrominoes to create complete horizontal lines. When
+          a line is completed, it disappears, and you earn points.
+        </p>
+        <p><strong>How to Play:</strong></p>
+        <ul>
+          <li>Prevent the blocks from stacking up to the top of the screen.</li>
+          <li>Clear lines by filling them completely without gaps.</li>
+        </ul>
+        <p><strong>Controls:</strong></p>
+        <ul>
+          <li>Move Left: Left Arrow / Swipe Left</li>
+          <li>Move Right: Right Arrow / Swipe Right</li>
+          <li>Rotate: Up Arrow / Tap</li>
+          <li>Soft Drop: Down Arrow / Swipe Down</li>
+          <li>Hard Drop: Spacebar / Swipe Down Fast</li>
+        </ul>
+        <button class="main-menu-button" id="instructions-back-button">
+          Back
+        </button>
+      </div>
+    </div>
+    <!-- Game Screen -->
+    <div class="screen" id="game-container">
+      <div class="container">
+        <div class="game-area" id="game-area"></div>
+        <div class="hud">
+          <div>Score: <span id="score">0</span></div>
+          <div>High Score: <span id="high-score">0</span></div>
+          <div>Level: <span id="level">1</span></div>
+        </div>
+        <!-- Only one next tetromino preview -->
+        <div class="next-tetrominoes" id="next-tetrominoes">
+          <h3>Next</h3>
+          <div class="next" id="next-1"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Game Over Screen -->
+    <div class="screen" id="game-over-screen">
+      <div class="container">
+        <div id="game-over-message">Game Over</div>
+        <button id="play-again-button">Play Again</button>
+        <button class="main-menu-button" id="game-over-main-menu-button">
+          Main Menu
+        </button>
+      </div>
+    </div>
+    <!-- Audio Elements -->
+    <audio autoplay id="background-music" loop>
+      <source src="background-music.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="start-game-sound">
+      <source src="start-game-sound.mp3" type="audio/mpeg" />
+    </audio>
+    <!-- Game Script -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Define Tetromino Shapes and Colors
+        const TETROMINOES = [
+          {
+            name: "yellow",
+            shape: [
+              [1, 1],
+              [1, 1],
+            ],
+            color: "yellow",
+          },
+          {
+            name: "cyan",
+            shape: [
+              [0, 2, 0],
+              [2, 2, 2],
+              [0, 0, 0],
+            ],
+            color: "cyan",
+          },
+          {
+            name: "blue",
+            shape: [
+              [0, 0, 3],
+              [3, 3, 3],
+              [0, 0, 0],
+            ],
+            color: "blue",
+          },
+          {
+            name: "orange",
+            shape: [
+              [4, 0, 0],
+              [4, 4, 4],
+              [0, 0, 0],
+            ],
+            color: "orange",
+          },
+          {
+            name: "green",
+            shape: [
+              [5, 5, 0],
+              [0, 5, 5],
+              [0, 0, 0],
+            ],
+            color: "green",
+          },
+          {
+            name: "red",
+            shape: [
+              [0, 6, 6],
+              [6, 6, 0],
+              [0, 0, 0],
+            ],
+            color: "red",
+          },
+          {
+            name: "purple",
+            shape: [
+              [0, 0, 0, 0],
+              [7, 7, 7, 7],
+              [0, 0, 0, 0],
+              [0, 0, 0, 0],
+            ],
+            color: "purple",
+          },
+        ];
+
+        class GameUI {
+          constructor() {
+            this.startMenuScreen = document.getElementById("start-menu-screen");
+            this.instructionsScreen =
+              document.getElementById("instructions-screen");
+            this.gameContainer = document.getElementById("game-container");
+            this.gameArea = document.getElementById("game-area");
+            this.gameOverScreen = document.getElementById("game-over-screen");
+            this.scoreElement = document.getElementById("score");
+            this.highScoreElement = document.getElementById("high-score");
+            this.levelElement = document.getElementById("level");
+            this.nextTetrominoesElement = document.getElementById(
+              "next-tetrominoes"
+            );
+            this.nextDisplay = document.getElementById("next-1");
+            this.touchStartX = 0;
+            this.touchStartY = 0;
+          }
+
+          swapToScreen(screen) {
+            this.startMenuScreen.classList.remove("active");
+            this.instructionsScreen.classList.remove("active");
+            this.gameContainer.classList.remove("active");
+            this.gameOverScreen.classList.remove("active");
+            screen.classList.add("active");
+          }
+
+          startGame() {
+            const startGameSound = document.getElementById("start-game-sound");
+            this.swapToScreen(this.gameContainer);
+            startGameSound.play();
+          }
+
+          endGame(score) {
+            // Update High Score
+            let highScore = localStorage.getItem("tetrisHighScore") || 0;
+            if (score > highScore) {
+              localStorage.setItem("tetrisHighScore", score);
+            }
+            this.swapToScreen(this.gameOverScreen);
+          }
+
+          mainMenu() {
+            this.swapToScreen(this.startMenuScreen);
+          }
+
+          playAgain() {
+            this.swapToScreen(this.gameContainer);
+          }
+
+          instructions() {
+            this.swapToScreen(this.instructionsScreen);
+          }
+
+          updateScore(score) {
+            this.scoreElement.textContent = score;
+          }
+
+          updateHighScore() {
+            let highScore = localStorage.getItem("tetrisHighScore") || 0;
+            this.highScoreElement.textContent = highScore;
+          }
+
+          updateLevel(level) {
+            this.levelElement.textContent = level;
+          }
+
+          clearGameArea() {
+            this.gameArea.innerHTML = "";
+            this.gameArea.style.gridTemplateRows = `repeat(20, 1fr)`;
+            this.gameArea.style.gridTemplateColumns = `repeat(10, 1fr)`;
+            for (let i = 0; i < 200; i++) {
+              const cell = document.createElement("div");
+              cell.classList.add("cell");
+              this.gameArea.appendChild(cell);
+            }
+          }
+
+          // Display Next Tetromino
+          displayNextTetromino(nextTetromino) {
+            this.nextDisplay.innerHTML = "";
+            const shape = nextTetromino.shape;
+            this.nextDisplay.style.gridTemplateRows = `repeat(${shape.length}, 1fr)`;
+            this.nextDisplay.style.gridTemplateColumns = `repeat(${shape[0].length}, 1fr)`;
+            for (let y = 0; y < shape.length; y++) {
+              for (let x = 0; x < shape[y].length; x++) {
+                const cell = document.createElement("div");
+                cell.classList.add("cell");
+                if (shape[y][x] > 0) {
+                  cell.classList.add("filled", nextTetromino.name);
+                }
+                this.nextDisplay.appendChild(cell);
+              }
+            }
+          }
+
+          // Show Score Popup
+          showScorePopup(points) {
+            const popup = document.createElement("div");
+            popup.classList.add("score-popup");
+            popup.textContent = `+${points}`;
+            // Position the popup at the center of the game area
+            popup.style.left = `${
+              this.gameArea.offsetLeft + this.gameArea.offsetWidth / 2 - 20
+            }px`;
+            popup.style.top = `${
+              this.gameArea.offsetTop + this.gameArea.offsetHeight / 2 - 20
+            }px`;
+            document.body.appendChild(popup);
+            // Remove the popup after animation
+            setTimeout(() => {
+              document.body.removeChild(popup);
+            }, 1000);
+          }
+
+          // Touch Controls
+          addTouchControls(onSwipeLeft, onSwipeRight, onSwipeDown, onTap) {
+            this.gameArea.addEventListener(
+              "touchstart",
+              (e) => {
+                this.touchStartX = e.changedTouches[0].screenX;
+                this.touchStartY = e.changedTouches[0].screenY;
+              },
+              false
+            );
+
+            this.gameArea.addEventListener(
+              "touchend",
+              (e) => {
+                let deltaX = e.changedTouches[0].screenX - this.touchStartX;
+                let deltaY = e.changedTouches[0].screenY - this.touchStartY;
+
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                  // Horizontal Swipe
+                  if (deltaX > 30) {
+                    onSwipeRight();
+                  } else if (deltaX < -30) {
+                    onSwipeLeft();
+                  }
+                } else {
+                  // Vertical Swipe
+                  if (deltaY > 30) {
+                    onSwipeDown();
+                  } else if (deltaY < -30) {
+                    onTap();
+                  }
+                }
+              },
+              false
+            );
+          }
+        }
+
+        class GameLogic {
+          constructor(ui) {
+            this.ui = ui;
+            this.resetGame();
+          }
+
+          resetGame() {
+            this.grid = Array(20)
+              .fill(null)
+              .map(() => Array(10).fill(0));
+            this.score = 0;
+            this.lines = 0;
+            this.level = 1;
+            this.speed = 1000;
+            this.gameOver = false;
+            // Generate next tetromino queue
+            this.tetrominoQueue = [
+              this.getRandomTetromino(),
+              this.getRandomTetromino(),
+            ];
+            this.currentTetromino = this.tetrominoQueue.shift();
+            this.currentPosition = { x: 3, y: 0 };
+            this.ui.updateScore(this.score);
+            this.ui.updateLevel(this.level);
+            this.ui.updateHighScore();
+            this.ui.clearGameArea();
+            this.ui.displayNextTetromino(this.tetrominoQueue[0]);
+            this.draw();
+          }
+
+          getRandomTetromino() {
+            return TETROMINOES[Math.floor(Math.random() * TETROMINOES.length)];
+          }
+
+          draw() {
+            this.ui.clearGameArea();
+            // Draw the grid
+            this.grid.forEach((row, y) => {
+              row.forEach((cell, x) => {
+                const index = y * 10 + x;
+                const cellElement = this.ui.gameArea.children[index];
+                if (cell > 0) {
+                  cellElement.className =
+                    "cell filled " + TETROMINOES[cell - 1].name;
+                } else {
+                  cellElement.className = "cell";
+                }
+              });
+            });
+
+            // Draw the current tetromino
+            this.currentTetromino.shape.forEach((row, dy) => {
+              row.forEach((value, dx) => {
+                if (value > 0) {
+                  const x = this.currentPosition.x + dx;
+                  const y = this.currentPosition.y + dy;
+                  if (y >= 0) {
+                    const index = y * 10 + x;
+                    const cellElement = this.ui.gameArea.children[index];
+                    cellElement.className =
+                      "cell filled " + this.currentTetromino.name;
+                  }
+                }
+              });
+            });
+          }
+
+          moveDown() {
+            if (this.checkCollision(0, 1, this.currentTetromino.shape)) {
+              this.mergeTetromino();
+              const linesCleared = this.clearLines();
+              if (linesCleared > 0) {
+                const pointsEarned = this.calculateScore(linesCleared);
+                this.score += pointsEarned;
+                this.lines += linesCleared;
+                if (this.lines >= this.level * 10) {
+                  this.level += 1;
+                  this.speed *= 0.9; // Increase speed
+                }
+                this.ui.updateScore(this.score);
+                this.ui.updateLevel(this.level);
+                // Show score popup
+                this.ui.showScorePopup(pointsEarned);
+              }
+              this.spawnTetromino();
+              if (this.checkCollision(0, 0, this.currentTetromino.shape)) {
+                this.gameOver = true;
+                this.ui.endGame(this.score);
+              }
+            } else {
+              this.currentPosition.y += 1;
+            }
+            this.draw();
+          }
+
+          moveLeft() {
+            if (!this.checkCollision(-1, 0, this.currentTetromino.shape)) {
+              this.currentPosition.x -= 1;
+              this.draw();
+            }
+          }
+
+          moveRight() {
+            if (!this.checkCollision(1, 0, this.currentTetromino.shape)) {
+              this.currentPosition.x += 1;
+              this.draw();
+            }
+          }
+
+          rotate() {
+            const rotatedShape = this.currentTetromino.shape.map((_, index) =>
+              this.currentTetromino.shape.map((col) => col[index]).reverse()
+            );
+            if (!this.checkCollision(0, 0, rotatedShape)) {
+              this.currentTetromino.shape = rotatedShape;
+              this.draw();
+            }
+          }
+
+          hardDrop() {
+            while (!this.checkCollision(0, 1, this.currentTetromino.shape)) {
+              this.currentPosition.y += 1;
+            }
+            this.moveDown();
+          }
+
+          checkCollision(dx, dy, shape) {
+            for (let y = 0; y < shape.length; y++) {
+              for (let x = 0; x < shape[y].length; x++) {
+                if (shape[y][x] > 0) {
+                  const newX = this.currentPosition.x + x + dx;
+                  const newY = this.currentPosition.y + y + dy;
+                  if (
+                    newX < 0 ||
+                    newX >= 10 ||
+                    newY >= 20 ||
+                    (newY >= 0 && this.grid[newY][newX] > 0)
+                  ) {
+                    return true;
+                  }
+                }
+              }
+            }
+            return false;
+          }
+
+          mergeTetromino() {
+            this.currentTetromino.shape.forEach((row, y) => {
+              row.forEach((value, x) => {
+                if (value > 0) {
+                  const newX = this.currentPosition.x + x;
+                  const newY = this.currentPosition.y + y;
+                  if (newY >= 0) {
+                    this.grid[newY][newX] =
+                      TETROMINOES.indexOf(this.currentTetromino) + 1;
+                  }
+                }
+              });
+            });
+          }
+
+          clearLines() {
+            let linesCleared = 0;
+            this.grid = this.grid.filter((row) => {
+              if (row.every((cell) => cell > 0)) {
+                linesCleared += 1;
+                return false;
+              }
+              return true;
+            });
+
+            while (this.grid.length < 20) {
+              this.grid.unshift(Array(10).fill(0));
+            }
+
+            return linesCleared;
+          }
+
+          calculateScore(linesCleared) {
+            const lineScores = [0, 40, 100, 300, 1200];
+            return lineScores[linesCleared] * this.level;
+          }
+
+          spawnTetromino() {
+            this.currentTetromino = this.tetrominoQueue.shift();
+            this.tetrominoQueue.push(this.getRandomTetromino());
+            this.currentPosition = { x: 3, y: 0 };
+            this.ui.displayNextTetromino(this.tetrominoQueue[0]);
+          }
+        }
+
+        class Game {
+          constructor() {
+            this.ui = new GameUI();
+            this.logic = new GameLogic(this.ui);
+            this.lastTime = 0;
+            this.dropCounter = 0;
+            this.paused = false;
+            this.animationFrameId = null;
+          }
+
+          startGame() {
+            this.ui.startGame();
+            this.logic.resetGame();
+            this.ui.addTouchControls(
+              this.logic.moveLeft.bind(this.logic),
+              this.logic.moveRight.bind(this.logic),
+              this.logic.moveDown.bind(this.logic),
+              this.logic.rotate.bind(this.logic)
+            );
+            this.update();
+          }
+
+          update(time = 0) {
+            const deltaTime = time - this.lastTime;
+            this.lastTime = time;
+            if (!this.logic.gameOver && !this.paused) {
+              this.dropCounter += deltaTime;
+              if (this.dropCounter > this.logic.speed) {
+                this.logic.moveDown();
+                this.dropCounter = 0;
+              }
+              this.animationFrameId = requestAnimationFrame(
+                this.update.bind(this)
+              );
+            } else {
+              cancelAnimationFrame(this.animationFrameId);
+            }
+          }
+
+          assignButtons() {
+            const playButton = document.getElementById("play-button");
+            const instructionsButton =
+              document.getElementById("instructions-button");
+            const playAgainButton = document.getElementById("play-again-button");
+            const mainMenuButtons = document.querySelectorAll(
+              ".main-menu-button"
+            );
+            const instructionsBackButton = document.getElementById(
+              "instructions-back-button"
+            );
+
+            instructionsButton.addEventListener(
+              "click",
+              this.ui.instructions.bind(this.ui)
+            );
+            playAgainButton.addEventListener("click", this.startGame.bind(this));
+            mainMenuButtons.forEach((button) =>
+              button.addEventListener("click", () => {
+                this.ui.mainMenu();
+                cancelAnimationFrame(this.animationFrameId);
+              })
+            );
+            playButton.addEventListener("click", this.startGame.bind(this));
+            instructionsBackButton.addEventListener(
+              "click",
+              this.ui.mainMenu.bind(this.ui)
+            );
+
+            // Keyboard Controls
+            document.addEventListener("keydown", (e) => {
+              if (this.ui.gameContainer.classList.contains("active")) {
+                if (e.key === "ArrowLeft") {
+                  this.logic.moveLeft();
+                } else if (e.key === "ArrowRight") {
+                  this.logic.moveRight();
+                } else if (e.key === "ArrowDown") {
+                  this.logic.moveDown();
+                } else if (e.key === "ArrowUp") {
+                  this.logic.rotate();
+                } else if (e.key === " ") {
+                  this.logic.hardDrop();
+                }
+              }
+            });
+          }
+        }
+
+        const game = new Game();
+        game.assignButtons();
+      });
+    </script>
+  </body>
+</html>
