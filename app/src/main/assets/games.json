@@ -1,27 +1,27 @@
 [
   {
     "id": 0,
-    "name": "Letter Loft",
+    "name": "Letter Loft Balloons",
     "icon": "letterloft.jpg",
-    "html": "letterloft.html"
+    "html": "letterloftballoons.html"
   },
   {
     "id": 2,
-    "name": "Math Dash",
+    "name": "Digit Drift",
     "icon": "mathdash.webp",
-    "html": "mathdash.html"
+    "html": "digitdrift.html"
   },
   {
     "id": 4,
-    "name": "Numeric Towers",
+    "name": "Number Summit",
     "icon": "numerictower.webp",
-    "html": "numerictowers.html"
+    "html": "numbersummit.html"
   },
   {
     "id": 3,
-    "name": "Word Tetris",
-    "icon": "wordtetris.webp",
-    "html": "retrowordtetris.html"
+    "name": "Drop & Spell",
+    "icon": "dropnspell.webp",
+    "html": "dropnspell.html"
   },
   {
     "id": 1,
@@ -33,12 +33,12 @@
     "id": 5,
     "name": "Snake Escape",
     "icon": "snakeescape.webp",
-    "html": "classicsnake.html"
+    "html": "snakeescape.html"
   },
   {
     "id": 6,
     "name": "Fit it Right",
     "icon": "fititright.webp",
-    "html": "classictetris.html"
+    "html": "fititright.html"
   }
 ]

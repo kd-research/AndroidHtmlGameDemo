@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Updated viewport meta tag for mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Retro Word Tetris</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap">
+    <style>
+        /* General Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Orbitron', sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            overflow: hidden;
+        }
+        .screen {
+            display: none;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        button {
+            background: linear-gradient(135deg, #283c86 0%, #45a247 100%);
+            border: 2px solid #fff;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            text-transform: uppercase;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            padding: 12px 30px;
+            margin: 20px auto 0;
+            display: block;
+            width: 215.15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #45a247 0%, #283c86 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        #game-title {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            color: #e94560;
+        }
+        #game-controls {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(26, 26, 46, 0.8);
+            padding: 10px 0;
+            z-index: 101;
+            display: none;
+            text-align: center;
+        }
+        #game-controls button {
+            display: inline-block;
+            width: auto;
+            padding: 8px 15px;
+            margin: 0 5px;
+            font-size: 14px;
+        }
+        #hud {
+            position: fixed;
+            top: 50px;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+            padding: 10px;
+            z-index: 100;
+            font-family: 'Orbitron', sans-serif;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: none; /* Hidden by default */
+        }
+        #hud-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        #hud span {
+            margin: 0 10px;
+        }
+        #hud .next-letter {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background-color: #e94560;
+            color: #fff;
+            font-size: 24px;
+            line-height: 50px;
+            text-align: center;
+            border-radius: 5px;
+            margin-left: 20px;
+        }
+        #hud .next-letter-label {
+            font-size: 18px;
+            margin-left: 20px;
+        }
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: calc(100% - 150px); /* Adjusted to account for HUD and controls height */
+            overflow: hidden;
+            background-color: #0f3460;
+            border: 2px solid #e94560;
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+            margin-top: 150px; /* Increased margin to push below HUD and controls */
+        }
+        #game-screen {
+            background: none;
+        }
+        #instructions-screen {
+            z-index: 200;
+        }
+        #instructions-screen.overlay {
+            background: rgba(0, 0, 0, 0.8);
+        }
+        #instructions-screen .container {
+            background: #1a1a2e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+        }
+        #gameBoard {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 1px;
+            background-color: #333;
+            margin: 0 auto; /* Center the game board */
+            width: 100%;
+            max-width: 400px;
+            height: 100%; /* Adjusted to fill the container */
+            background-color: #1a1a2e;
+            border: 2px solid #e94560;
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+        }
+        .cell {
+            background-color: #1a1a2e;
+            border: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+        .cell::before {
+            content: '';
+            display: block;
+            padding-bottom: 100%; /* Makes the cell square */
+        }
+        .cell span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: calc(1.5em + 1vw); /* Responsive font size */
+            user-select: none;
+            word-break: break-all;
+        }
+        /* Game Over Screen */
+        #game-over-screen .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #game-over-message {
+            font-size: 36px;
+            text-align: center;
+            color: #e94560;
+            margin-bottom: 40px;
+        }
+        /* Responsive Adjustments */
+        @media only screen and (max-width: 600px) {
+            #game-title {
+                font-size: 2em;
+            }
+            button {
+                width: 80%;
+                font-size: 16px;
+            }
+            #game-controls button {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            .cell span {
+                font-size: calc(1.5em + 2vw);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Game Controls -->
+    <div id="game-controls">
+        <button id="game-menu-button">Menu</button>
+        <button id="game-restart-button">Restart</button>
+        <button id="game-instructions-button">Instructions</button>
+    </div>
+
+    <!-- Heads-Up Display (HUD) -->
+    <div id="hud">
+        <div id="hud-content">
+            <span id="score">Score: 0</span> | 
+            <span id="highScore">High Score: 0</span> |
+            <span class="next-letter-label">Next:</span>
+            <div class="next-letter" id="nextLetter">A</div>
+        </div>
+    </div>
+
+    <!-- Start Menu Screen -->
+    <div id="start-menu-screen" class="active screen">
+        <div class="container">
+            <h1 id="game-title">Drop And Spell</h1>
+            <button id="play-button">Play</button>
+            <button id="settings-button">Settings</button>
+            <button id="instructions-button">Instructions</button>
+        </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settings-screen" class="screen">
+        <div class="container">
+            <h2>Settings</h2>
+            <p>Select Difficulty Level:</p>
+            <div class="radio-option">
+                <input type="radio" id="easy" name="difficulty" value="Easy" checked>
+                <label for="easy">Easy</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="medium" name="difficulty" value="Medium">
+                <label for="medium">Medium</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="hard" name="difficulty" value="Hard">
+                <label for="hard">Hard</label>
+            </div>
+            <button id="setting-back-button">Back</button>
+        </div>
+    </div>
+
+    <!-- Instructions Screen -->
+    <div id="instructions-screen" class="screen">
+        <div class="container">
+            <h2>Instructions</h2>
+            <p>
+                Welcome to <strong>Retro Word Tetris</strong>! The goal of the game is to form words using falling letters.
+            </p>
+            <p>
+                <strong>Controls:</strong>
+            </p>
+            <ul>
+                <li><strong>Tap Left Side:</strong> Move the letter left</li>
+                <li><strong>Tap Right Side:</strong> Move the letter right</li>
+                <li><strong>Tap Below Letter:</strong> Move the letter down faster</li>
+            </ul>
+            <p>
+                Form valid words horizontally, vertically, and diagonally in any direction to score points. The game ends when the letters reach the top of the game board.
+            </p>
+            <button id="instructions-back-button">Back</button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div id="game-container">
+            <div id="gameBoard">
+                <!-- Cells will be dynamically generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="screen">
+        <div class="container">
+            <div id="game-over-message">Game Over!</div>
+            <button id="play-again-button">Play Again</button>
+            <button id="game-over-main-menu-button" class="main-menu-button">Main Menu</button>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="background-music" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="new-letter-sound">
+        <source src="https://www.soundjay.com/button/sounds/button-3.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="tile-placed-sound">
+        <source src="https://www.soundjay.com/button/sounds/button-10.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="word-formed-sound">
+        <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="game-over-sound">
+        <source src="https://www.soundjay.com/button/sounds/beep-07.mp3" type="audio/mpeg" />
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            class GameUI {
+                constructor() {
+                    // Screen elements
+                    this.screens = {
+                        startMenu: document.getElementById('start-menu-screen'),
+                        settings: document.getElementById('settings-screen'),
+                        instructions: document.getElementById('instructions-screen'),
+                        game: document.getElementById('game-screen'),
+                        gameOver: document.getElementById('game-over-screen')
+                    };
+                    this.hud = document.getElementById('hud');
+                    this.gameControls = document.getElementById('game-controls');
+                    this.scoreElement = document.getElementById('score');
+                    this.highScoreElement = document.getElementById('highScore');
+                    this.nextLetterElement = document.getElementById('nextLetter');
+                    this.gameBoard = document.getElementById('gameBoard');
+                    this.gameOverMessage = document.getElementById('game-over-message');
+                    this.difficultyRadios = document.getElementsByName('difficulty');
+
+                    // Audio elements
+                    this.backgroundMusic = document.getElementById('background-music');
+                    this.newLetterSound = document.getElementById('new-letter-sound');
+                    this.tilePlacedSound = document.getElementById('tile-placed-sound');
+                    this.wordFormedSound = document.getElementById('word-formed-sound');
+                    this.gameOverSound = document.getElementById('game-over-sound');
+
+                    this.highScore = 0;
+                    this.difficulty = 'Easy';
+
+                    this.bindUIActions();
+                }
+
+                bindUIActions() {
+                    this.difficultyRadios.forEach(radio => {
+                        radio.addEventListener('change', (e) => {
+                            this.setDifficulty(e.target.value);
+                        });
+                    });
+                }
+
+                setDifficulty(level) {
+                    this.difficulty = level;
+                }
+
+                showScreen(screenName) {
+                    Object.values(this.screens).forEach(screen => screen.classList.remove('active'));
+                    this.screens[screenName].classList.add('active');
+                    if (screenName === 'game') {
+                        this.hud.style.display = 'block';
+                        this.gameControls.style.display = 'block';
+                    } else {
+                        this.hud.style.display = 'none';
+                        this.gameControls.style.display = 'none';
+                    }
+                }
+
+                startGame() {
+                    this.showScreen('game');
+                    this.playBackgroundMusic();
+                }
+
+                endGame(score) {
+                    this.showScreen('gameOver');
+                    this.gameOverMessage.innerHTML = `Game Over!<br>Your Score: ${score}<br>High Score: ${this.highScore}`;
+                    this.stopBackgroundMusic();
+                    this.playGameOverSound();
+                }
+
+                updateHUD(score, nextLetter) {
+                    this.scoreElement.innerText = `Score: ${score}`;
+                    this.highScoreElement.innerText = `High Score: ${this.highScore}`;
+                    this.nextLetterElement.innerText = nextLetter;
+                }
+
+                initializeGameBoard(rows, cols, addCellCallback) {
+                    this.gameBoard.innerHTML = '';
+                    for (let row = 0; row < rows; row++) {
+                        for (let col = 0; col < cols; col++) {
+                            const cell = document.createElement('div');
+                            cell.classList.add('cell');
+                            cell.dataset.row = row;
+                            cell.dataset.col = col;
+                            cell.innerHTML = '<span></span>'; // Add a span to hold the letter
+                            addCellCallback(cell);
+                            this.gameBoard.appendChild(cell);
+                        }
+                    }
+                }
+
+                playBackgroundMusic() {
+                    this.backgroundMusic.currentTime = 0;
+                    this.backgroundMusic.play();
+                }
+
+                stopBackgroundMusic() {
+                    this.backgroundMusic.pause();
+                }
+
+                playNewLetterSound() {
+                    this.newLetterSound.currentTime = 0;
+                    this.newLetterSound.play();
+                }
+
+                playTilePlacedSound() {
+                    this.tilePlacedSound.currentTime = 0;
+                    this.tilePlacedSound.play();
+                }
+
+                playWordFormedSound() {
+                    this.wordFormedSound.currentTime = 0;
+                    this.wordFormedSound.play();
+                }
+
+                playGameOverSound() {
+                    this.gameOverSound.currentTime = 0;
+                    this.gameOverSound.play();
+                }
+            }
+
+            class GameLogic {
+                constructor(ui) {
+                    this.ui = ui;
+                    this.score = 0;
+                    this.nextLetter = 'A';
+                    this.currentLetter = null;
+                    this.currentPosition = { row: 0, col: 4 };
+                    this.isPaused = false;
+                    this.dictionary = [];
+                    this.letterPoints = {
+                        'A': 1, 'B': 3, 'C': 3, 'D': 2,
+                        'E': 1, 'F': 4, 'G': 2, 'H': 4,
+                        'I': 1, 'J': 8, 'K': 5, 'L': 1,
+                        'M': 3, 'N': 1, 'O': 1, 'P': 3,
+                        'Q': 10, 'R': 1, 'S': 1, 'T': 1,
+                        'U': 1, 'V': 4, 'W': 4, 'X': 8,
+                        'Y': 4, 'Z': 10
+                    };
+                    this.animationFrameId = null;
+                    this.gameSpeedSettings = {
+                        'Easy': 1000,
+                        'Medium': 700,
+                        'Hard': 400
+                    };
+                    this.gameSpeed = this.gameSpeedSettings[this.ui.difficulty];
+                    this.lastUpdateTime = 0;
+                    this.loadWordList('https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt');
+                }
+
+                async loadWordList(url) {
+                    try {
+                        const response = await fetch(url);
+                        const text = await response.text();
+                        this.dictionary = text.split('\n').map(word => word.trim().toUpperCase());
+                    } catch (error) {
+                        console.error('Failed to load word list:', error);
+                    }
+                }
+
+                getRandomLetter() {
+                    const weightedLetters = [];
+                    const vowels = ['A', 'E', 'I', 'O', 'U'];
+
+                    // Generate weighted pool
+                    for (let letter in this.letterPoints) {
+                        let frequency = 11 - this.letterPoints[letter];
+                        if (vowels.includes(letter)) {
+                            frequency *= 2;
+                        }
+                        for (let i = 0; i < frequency; i++) {
+                            weightedLetters.push(letter);
+                        }
+                    }
+
+                    return weightedLetters[Math.floor(Math.random() * weightedLetters.length)];
+                }
+
+                createGameBoard(rows, cols) {
+                    this.ui.initializeGameBoard(rows, cols, (cell) => {
+                        // Additional cell initialization if needed
+                    });
+                }
+
+                updateHUD() {
+                    this.ui.updateHUD(this.score, this.nextLetter);
+                }
+
+                getLuminance(color) {
+                    let r = parseInt(color.substr(1, 2), 16) / 255;
+                    let g = parseInt(color.substr(3, 2), 16) / 255;
+                    let b = parseInt(color.substr(5, 2), 16) / 255;
+                    // per ITU-R BT.709
+                    let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                    return luminance;
+                }
+
+                placeLetter(row, col, letter) {
+                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+                    if (cell) {
+                        const span = cell.querySelector('span');
+                        span.innerText = letter;
+                        // Assign random color to cell
+                        const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+                        const luminance = this.getLuminance(randomColor);
+                        const fontColor = luminance < 0.5 ? '#FFFFFF' : '#000000';
+                        cell.style.backgroundColor = randomColor;
+                        span.style.color = fontColor;
+                    }
+                }
+
+                clearLetter(row, col) {
+                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+                    if (cell) {
+                        const span = cell.querySelector('span');
+                        span.innerText = '';
+                        cell.style.backgroundColor = '#1a1a2e';
+                    }
+                }
+
+                isOccupied(row, col) {
+                    if (row < 0 || row >= 20 || col < 0 || col >= 10) return false;
+                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+                    const span = cell.querySelector('span');
+                    return span && span.innerText !== '';
+                }
+
+                calculateWordScore(word) {
+                    return word.split('').reduce((acc, letter) => acc + this.letterPoints[letter], 0);
+                }
+
+                clearWord(cells) {
+                    cells.forEach(({ row, col }) => {
+                        this.clearLetter(row, col);
+                    });
+                }
+
+                applyGravity() {
+                    for (let col = 0; col < 10; col++) {
+                        for (let row = 18; row >= 0; row--) { // Start from second to last row
+                            if (this.isOccupied(row, col) && !this.isOccupied(row + 1, col)) {
+                                let currentRow = row;
+                                while (currentRow < 19 && !this.isOccupied(currentRow + 1, col)) {
+                                    const letter = this.getLetterAt(currentRow, col);
+                                    this.clearLetter(currentRow, col);
+                                    this.placeLetter(currentRow + 1, col, letter);
+                                    currentRow++;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                getLetterAt(row, col) {
+                    const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+                    if (cell) {
+                        const span = cell.querySelector('span');
+                        return span.innerText;
+                    }
+                    return '';
+                }
+
+                checkForWords() {
+                    let wordFormed = false;
+                    const wordsToClear = [];
+                    const directions = [
+                        { dr: 0, dc: 1 },   // Horizontal right
+                        { dr: 1, dc: 0 },   // Vertical down
+                        { dr: 1, dc: 1 },   // Diagonal down-right
+                        { dr: 1, dc: -1 },  // Diagonal down-left
+                    ];
+
+                    for (let row = 0; row < 20; row++) {
+                        for (let col = 0; col < 10; col++) {
+                            directions.forEach(({ dr, dc }) => {
+                                let word = '';
+                                let cells = [];
+                                let r = row;
+                                let c = col;
+                                while (r >= 0 && r < 20 && c >= 0 && c < 10) {
+                                    if (this.isOccupied(r, c)) {
+                                        const letter = this.getLetterAt(r, c);
+                                        word += letter;
+                                        cells.push({ row: r, col: c });
+                                        if (word.length >= 3 && this.dictionary.includes(word)) {
+                                            wordsToClear.push({ word, cells: [...cells] });
+                                        }
+                                    } else {
+                                        break;
+                                    }
+                                    r += dr;
+                                    c += dc;
+                                }
+                            });
+                        }
+                    }
+
+                    if (wordsToClear.length > 0) {
+                        wordFormed = true;
+                        wordsToClear.forEach(({ word, cells }) => {
+                            this.score += this.calculateWordScore(word);
+                            this.clearWord(cells);
+                        });
+                        this.ui.playWordFormedSound();
+                        this.updateHUD();
+                    }
+
+                    return wordFormed;
+                }
+
+                handleWordFormation() {
+                    let wordsFound;
+                    do {
+                        wordsFound = this.checkForWords();
+                        if (wordsFound) {
+                            this.applyGravity();
+                        }
+                    } while (wordsFound);
+                }
+
+                moveLetterDown() {
+                    if (this.isPaused) return;
+                    if (this.currentPosition.row < 19 && !this.isOccupied(this.currentPosition.row + 1, this.currentPosition.col)) {
+                        this.clearLetter(this.currentPosition.row, this.currentPosition.col);
+                        this.currentPosition.row++;
+                        this.placeLetter(this.currentPosition.row, this.currentPosition.col, this.currentLetter);
+                    } else {
+                        this.ui.playTilePlacedSound();
+                        this.handleWordFormation();
+                        if (this.currentPosition.row === 0) {
+                            this.endGame();
+                            return;
+                        }
+                        this.currentLetter = this.nextLetter;
+                        this.nextLetter = this.getRandomLetter();
+                        this.ui.playNewLetterSound();
+                        this.currentPosition = { row: 0, col: 4 };
+                        this.updateHUD();
+                        this.placeLetter(this.currentPosition.row, this.currentPosition.col, this.currentLetter);
+                    }
+                }
+
+                moveLetterLeft() {
+                    if (this.isPaused) return;
+                    if (this.currentPosition.col > 0 && !this.isOccupied(this.currentPosition.row, this.currentPosition.col - 1)) {
+                        this.clearLetter(this.currentPosition.row, this.currentPosition.col);
+                        this.currentPosition.col--;
+                        this.placeLetter(this.currentPosition.row, this.currentPosition.col, this.currentLetter);
+                    }
+                }
+
+                moveLetterRight() {
+                    if (this.isPaused) return;
+                    if (this.currentPosition.col < 9 && !this.isOccupied(this.currentPosition.row, this.currentPosition.col + 1)) {
+                        this.clearLetter(this.currentPosition.row, this.currentPosition.col);
+                        this.currentPosition.col++;
+                        this.placeLetter(this.currentPosition.row, this.currentPosition.col, this.currentLetter);
+                    }
+                }
+
+                quickDropLetter() {
+                    if (this.isPaused) return;
+                    while (this.currentPosition.row < 19 && !this.isOccupied(this.currentPosition.row + 1, this.currentPosition.col)) {
+                        this.clearLetter(this.currentPosition.row, this.currentPosition.col);
+                        this.currentPosition.row++;
+                    }
+                    this.placeLetter(this.currentPosition.row, this.currentPosition.col, this.currentLetter);
+                    this.moveLetterDown();
+                }
+
+                pauseGame() {
+                    this.isPaused = !this.isPaused;
+                    if (!this.isPaused) {
+                        this.lastUpdateTime = performance.now();
+                        this.gameLoop();
+                    }
+                }
+
+                startGameLoop() {
+                    this.lastUpdateTime = performance.now();
+                    this.gameLoop();
+                }
+
+                gameLoop(currentTime) {
+                    if (this.isPaused) return;
+                    const deltaTime = currentTime - this.lastUpdateTime;
+                    if (deltaTime >= this.gameSpeed) {
+                        this.moveLetterDown();
+                        this.lastUpdateTime = currentTime;
+                    }
+                    this.animationFrameId = requestAnimationFrame(this.gameLoop.bind(this));
+                }
+
+                endGame() {
+                    cancelAnimationFrame(this.animationFrameId);
+                    if (this.score > this.ui.highScore) {
+                        this.ui.highScore = this.score;
+                    }
+                    this.ui.endGame(this.score);
+                }
+
+                resetGame() {
+                    // Cancel any existing animation frame
+                    if (this.animationFrameId) {
+                        cancelAnimationFrame(this.animationFrameId);
+                    }
+                    this.gameSpeed = this.gameSpeedSettings[this.ui.difficulty];
+                    this.score = 0;
+                    this.currentLetter = this.getRandomLetter();
+                    this.nextLetter = this.getRandomLetter();
+                    this.currentPosition = { row: 0, col: 4 };
+                    this.isPaused = false;
+                    this.ui.updateHUD(this.score, this.nextLetter);
+                    this.createGameBoard(20, 10);
+                    this.placeLetter(this.currentPosition.row, this.currentPosition.col, this.currentLetter);
+                    this.ui.playNewLetterSound();
+                    this.startGameLoop();
+                }
+
+                initialize() {
+                    this.createGameBoard(20, 10);
+                    this.resetGame();
+                }
+            }
+
+            class Game {
+                constructor() {
+                    this.ui = new GameUI();
+                    this.logic = null;
+                    this.assignButtons();
+                }
+
+                startGame() {
+                    if (this.logic) {
+                        this.logic.resetGame();
+                    } else {
+                        this.logic = new GameLogic(this.ui);
+                        this.logic.initialize();
+                    }
+                    this.ui.startGame();
+                }
+
+                resetGame() {
+                    if (this.logic) {
+                        this.logic.resetGame();
+                    }
+                }
+
+                assignButtons() {
+                    document.getElementById('play-button').addEventListener('click', this.startGame.bind(this));
+                    document.getElementById('settings-button').addEventListener('click', () => this.ui.showScreen('settings'));
+                    document.getElementById('instructions-button').addEventListener('click', () => this.ui.showScreen('instructions'));
+                    document.getElementById('setting-back-button').addEventListener('click', () => this.ui.showScreen('startMenu'));
+                    document.getElementById('instructions-back-button').addEventListener('click', () => {
+                        if (this.logic && this.logic.isPaused) {
+                            this.ui.showScreen('game');
+                            this.logic.pauseGame();
+                        } else {
+                            this.ui.showScreen('startMenu');
+                        }
+                    });
+                    document.getElementById('play-again-button').addEventListener('click', this.startGame.bind(this));
+                    document.getElementById('game-over-main-menu-button').addEventListener('click', () => this.ui.showScreen('startMenu'));
+                    document.getElementById('game-menu-button').addEventListener('click', () => {
+                        if (this.logic) {
+                            this.logic.endGame();
+                        }
+                        this.ui.showScreen('startMenu');
+                    });
+                    document.getElementById('game-restart-button').addEventListener('click', this.resetGame.bind(this));
+                    document.getElementById('game-instructions-button').addEventListener('click', () => {
+                        if (this.logic) {
+                            this.logic.pauseGame();
+                        }
+                        this.ui.showScreen('instructions');
+                    });
+
+                    // Keyboard Controls
+                    document.addEventListener('keydown', (event) => {
+                        if (!this.ui.screens.game.classList.contains('active')) return;
+                        if (this.logic.isPaused) return;
+                        switch (event.key) {
+                            case 'ArrowLeft':
+                            case 'a':
+                            case 'A':
+                                this.logic.moveLetterLeft();
+                                break;
+                            case 'ArrowRight':
+                            case 'd':
+                            case 'D':
+                                this.logic.moveLetterRight();
+                                break;
+                            case 'ArrowDown':
+                            case 's':
+                            case 'S':
+                                this.logic.moveLetterDown();
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+
+                    // Touch Controls
+                    this.ui.gameBoard.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+                }
+
+                handleTouchStart(e) {
+                    e.preventDefault();
+                    if (!this.ui.screens.game.classList.contains('active')) return;
+                    if (this.logic.isPaused) return;
+
+                    const touch = e.touches[0];
+                    const touchX = touch.clientX;
+                    const touchY = touch.clientY;
+
+                    // Get the position of the gameBoard
+                    const gameBoardRect = this.ui.gameBoard.getBoundingClientRect();
+
+                    // Check if touch is within the gameBoard
+                    if (
+                        touchX < gameBoardRect.left ||
+                        touchX > gameBoardRect.right ||
+                        touchY < gameBoardRect.top ||
+                        touchY > gameBoardRect.bottom
+                    ) {
+                        return;
+                    }
+
+                    // Get the position of the current letter
+                    const currentCol = this.logic.currentPosition.col;
+                    const currentRow = this.logic.currentPosition.row;
+
+                    const cellWidth = gameBoardRect.width / 10;
+                    const cellHeight = gameBoardRect.height / 20;
+
+                    const letterX = gameBoardRect.left + cellWidth * currentCol + cellWidth / 2;
+                    const letterY = gameBoardRect.top + cellHeight * currentRow + cellHeight / 2;
+
+                    if (touchX < letterX - cellWidth / 2) {
+                        // Touch is on the left side of the current letter
+                        this.logic.moveLetterLeft();
+                    } else if (touchX > letterX + cellWidth / 2) {
+                        // Touch is on the right side of the current letter
+                        this.logic.moveLetterRight();
+                    } else if (touchY > letterY + cellHeight / 2) {
+                        // Touch is below the current letter
+                        this.logic.moveLetterDown();
+                    }
+                }
+            }
+
+            const game = new Game();
+        });
+    </script>
+</body>
+</html>

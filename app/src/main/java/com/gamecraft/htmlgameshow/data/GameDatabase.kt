@@ -35,7 +35,10 @@ abstract class GameDatabase : RoomDatabase() {
             val existingIds = db().ids()
 
             for (gameImport in GameImport.games(context)) {
-                val game = Game(
+                val gameId = gameImport.id
+
+                if (!existingIds.contains(gameId)) {
+                    val game = Game(
                     id = gameImport.id,
                     name = gameImport.name,
                     icon = gameImport.icon,
@@ -43,8 +46,18 @@ abstract class GameDatabase : RoomDatabase() {
                     highestScore = 0,
                     favourite = false
                 )
-                if (!existingIds.contains(game.id)) {
                     db().insert(game)
+                } else {
+                    val oldGame = db().find(gameId)
+                    val newGame = Game(
+                        id = gameImport.id,
+                        name = gameImport.name,
+                        icon = gameImport.icon,
+                        html = gameImport.html,
+                        highestScore = oldGame.highestScore,
+                        favourite = oldGame.favourite
+                    )
+                    db().update(newGame)
                 }
             }
         }

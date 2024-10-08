@@ -25,4 +25,5 @@ interface GameDao {
 
     @Query("Update game Set highestScore = 0")
     fun resetHighestScore()
+
 }
