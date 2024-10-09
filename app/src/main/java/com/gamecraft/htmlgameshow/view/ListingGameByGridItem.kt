@@ -63,9 +63,9 @@ fun ListingGameByGridItem(
                 onClick = onFavouriteClick,
             ) {
                 if (target.favourite)
-                    Icon(Icons.Filled.Star, contentDescription = "Favourite", tint = Color.Yellow)
+                    Icon(Icons.Filled.Star, contentDescription = "Like ${target.name}", tint = Color.Yellow)
                 else
-                    Icon(Icons.Outlined.Star, contentDescription = "Not Favourite", tint = Color.Gray)
+                    Icon(Icons.Outlined.Star, contentDescription = "Dislike ${target.name}", tint = Color.Gray)
             }
         }
     }
